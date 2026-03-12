@@ -93,7 +93,7 @@ private fun TranscriptEntry(transcript: Transcript) {
             transcript.text,
             style = MaterialTheme.typography.bodyMedium
         )
-        HorizontalDivider(modifier = Modifier.padding(top = 8.dp), thickness = 0.5.dp)
+        Divider(modifier = Modifier.padding(top = 8.dp), thickness = 0.5.dp)
     }
 }
 
