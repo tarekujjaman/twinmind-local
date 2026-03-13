@@ -32,8 +32,9 @@ mkdir -p "$ANDROID_SDK/cmdline-tools"
 cd "$ANDROID_SDK/cmdline-tools"
 
 if [ ! -f "cmdline-tools.zip" ]; then
+  # Use cmdline-tools v9 — newer versions crash in Termux (Perfetto JVM bug)
   wget -q --show-progress \
-    "https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip" \
+    "https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip" \
     -O cmdline-tools.zip
 fi
 
@@ -58,6 +59,8 @@ EOF
 
 echo ""
 echo "===== Step 6: Accept licenses ====="
+# Suppress JVM profiling that crashes in Termux
+export JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8 -XX:-UsePerfData"
 yes | sdkmanager --licenses > /dev/null 2>&1 || true
 
 echo ""
