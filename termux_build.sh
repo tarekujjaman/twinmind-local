@@ -17,7 +17,8 @@ pkg update -y && pkg upgrade -y
 
 echo ""
 echo "===== Step 2: Install dependencies ====="
-pkg install -y git wget unzip openjdk-17
+# openjdk-17 is not in Termux repos; openjdk-21 compiles Java 17 targets fine
+pkg install -y git wget unzip openjdk-21
 
 echo ""
 echo "===== Step 3: Set JAVA_HOME ====="
