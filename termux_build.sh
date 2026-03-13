@@ -58,9 +58,17 @@ export PATH="\$ANDROID_HOME/cmdline-tools/latest/bin:\$ANDROID_HOME/platform-too
 EOF
 
 echo ""
+echo "===== Step 5b: Remove Perfetto native lib (crashes Termux JVM) ====="
+# sdkmanager ships libperfetto_sdk_jni.so which calls RegisterNatives for
+# com.android.internal.dev.perfetto.sdk.PerfettoTrace — a class that only
+# exists in Android's ART, not in OpenJDK. Removing the .so prevents the crash.
+find "$CMDLINE_TOOLS" -name "libperfetto*.so" -delete 2>/dev/null || true
+find "$CMDLINE_TOOLS" -name "*perfetto*.so"   -delete 2>/dev/null || true
+echo "Perfetto libs removed."
+
+echo ""
 echo "===== Step 6: Accept licenses ====="
-# Suppress JVM profiling that crashes in Termux
-export JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8 -XX:-UsePerfData"
+export JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8"
 yes | sdkmanager --licenses > /dev/null 2>&1 || true
 
 echo ""
