@@ -32,8 +32,9 @@ mkdir -p "$ANDROID_SDK/cmdline-tools"
 cd "$ANDROID_SDK/cmdline-tools"
 
 if [ ! -f "cmdline-tools.zip" ]; then
+  # Use cmdline-tools v9 — newer versions crash in Termux (Perfetto JVM bug)
   wget -q --show-progress \
-    "https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip" \
+    "https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip" \
     -O cmdline-tools.zip
 fi
 
@@ -57,7 +58,17 @@ export PATH="\$ANDROID_HOME/cmdline-tools/latest/bin:\$ANDROID_HOME/platform-too
 EOF
 
 echo ""
+echo "===== Step 5b: Remove Perfetto native lib (crashes Termux JVM) ====="
+# sdkmanager ships libperfetto_sdk_jni.so which calls RegisterNatives for
+# com.android.internal.dev.perfetto.sdk.PerfettoTrace — a class that only
+# exists in Android's ART, not in OpenJDK. Removing the .so prevents the crash.
+find "$CMDLINE_TOOLS" -name "libperfetto*.so" -delete 2>/dev/null || true
+find "$CMDLINE_TOOLS" -name "*perfetto*.so"   -delete 2>/dev/null || true
+echo "Perfetto libs removed."
+
+echo ""
 echo "===== Step 6: Accept licenses ====="
+export JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8"
 yes | sdkmanager --licenses > /dev/null 2>&1 || true
 
 echo ""
